@@ -39,7 +39,10 @@ exports.createProfileWithTransaction = function( req, res, next ) {
 		description : 'payinguser@example.com'
 	}, function(err, customer) {
 		if (err) {
-			return res.status(500);
+			return res.json( {
+                success: false,
+                message: err.message
+            });
 		}
 		Stripe.charges.create( {
 	        amount: req.body.amount,
@@ -47,7 +50,17 @@ exports.createProfileWithTransaction = function( req, res, next ) {
 	        customer : customer.id
 	    }, function( err, charge ) {
 	    	if (err) {
-				return res.status(500);
+	    		if(err.param == 'amount' && err.message == 'Invalid integer: ') {
+	    			return res.json( {
+		                success: false,
+		                message: 'Invalid amount'
+		            });
+	    		}else {
+		    		return res.json( {
+		                success: false,
+		                message: err.message
+		            });
+	    		}
 			}
 			User.findOne({ name : email}, function (err, users){
 				users.customerId = customer.id;
@@ -76,17 +89,12 @@ exports.createProfileWithTransaction = function( req, res, next ) {
 	                    } );
 	                }
 	            } );
-	            // asynchronously called
 	    } );
 	});
 };
 
 exports.createTransaction = function( req, res, next ) {
 
-//	var cardnumber = req.body.customerid;
-//	var cardexpirymonth = req.body.cardexpirymonth;
-//	var cardexpiryyear = req.body.cardexpiryyear;
-//	var cvc = req.body.cvc;
 	var email = req.body.username;
 	var customerId = req.body.customerProfileId;	
 	if(!customerId) { 
@@ -98,7 +106,17 @@ exports.createTransaction = function( req, res, next ) {
 	        customer : customerId
 	    }, function( err, charge ) {
 	    	if (err) {
-				return res.status(500);
+	    		if(err.param == 'amount' && err.message == 'Invalid integer: ') { 
+	    			return res.json( {
+		                success: false,
+		                message: 'Invalid amount'
+		            });
+	    		}else {
+		    		return res.json( {
+		                success: false,
+		                message: err.message
+		            });
+	    		}
 			}		
 	        var transaction = new Transactions( {
 	            transactionId: charge.id,
@@ -119,7 +137,6 @@ exports.createTransaction = function( req, res, next ) {
 	                    } );
 	                }
 	            } );
-	            // asynchronously called
 	    } );
 	}
 };
