@@ -51,7 +51,7 @@ exports.index = function( req, res ) {
                             customerProfileId: user.customerId,
                             custcardexpirymonth : customer.sources.data[0].exp_month,
                             custcardexpiryyear: customer.sources.data[0].exp_year,
-                            customerCardId:'**** **** **** '+customer.sources.data[0].last4
+                            customerCardId:'************'+customer.sources.data[0].last4
                         } );
                 	}
                 	);
