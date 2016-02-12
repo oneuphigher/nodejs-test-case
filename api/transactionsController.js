@@ -97,9 +97,9 @@ exports.createTransaction = function( req, res, next ) {
 	        currency: req.body.currency,
 	        customer : customerId
 	    }, function( err, charge ) {
-	        if ( err ) {
-	            return console.log( err );
-	        }		
+	    	if (err) {
+				return res.status(500);
+			}		
 	        var transaction = new Transactions( {
 	            transactionId: charge.id,
 	            amount: charge.amount,
