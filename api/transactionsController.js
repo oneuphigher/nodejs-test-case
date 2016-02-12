@@ -38,14 +38,17 @@ exports.createProfileWithTransaction = function( req, res, next ) {
 		email : email,
 		description : 'payinguser@example.com'
 	}, function(err, customer) {
+		if (err) {
+			return res.status(500);
+		}
 		Stripe.charges.create( {
 	        amount: req.body.amount,
 	        currency: req.body.currency,
 	        customer : customer.id
 	    }, function( err, charge ) {
-	        if ( err ) {
-	            return console.log( err );
-	        }
+	    	if (err) {
+				return res.status(500);
+			}
 			User.findOne({ name : email}, function (err, users){
 				users.customerId = customer.id;
 				users.save(function (err){	
