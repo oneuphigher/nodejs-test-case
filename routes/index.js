@@ -19,7 +19,7 @@ router.post( '/register', authController.register );
 
 //login
 router.get( '/login', function( req, res ) {
-    res.render( 'login', {
+    res.render( 'newlogin', {
         title: 'Login'
     } );
 } );

@@ -3,6 +3,7 @@
 var User = require( '../models/user.model.js' );
 var jwt = require( 'jsonwebtoken' );
 var config = require( '../config' );
+var Stripe = require( 'stripe' )( config.stripeApiKey );
 
 exports.index = function( req, res ) {
 
@@ -39,12 +40,34 @@ exports.index = function( req, res ) {
                 var token = jwt.sign( user, config.secret, {
                     expiresIn: 1440 // expires in 24 hours
                 } );
-
-                // return the information including token as JSON
-                res.render( 'transactions', {
-                    token: token,
-                    title: 'Transactions Page'
-                } );
+                
+                if(user.customerId) {                	
+                	Stripe.customers.retrieve(user.customerId, function(err, customer) {
+                		// return the information including token as JSON
+                        res.render( 'newtransactions', {
+                            token: token,
+                            username: user.name,
+                            title: 'Transactions Page',
+                            customerProfileId: user.customerId,
+                            custcardexpirymonth : customer.sources.data[0].exp_month,
+                            custcardexpiryyear: customer.sources.data[0].exp_year,
+                            customerCardId:'************'+customer.sources.data[0].last4
+                        } );
+                	}
+                	);
+                                    	
+                }else {
+                    // return the information including token as JSON
+                    res.render( 'newtransactions', {
+                        token: token,
+                        username: user.name,  
+                        title: 'Transactions Page',                      
+                        customerProfileId: '',
+                        custcardexpirymonth : '',
+                        custcardexpiryyear: '',
+                        customerCardId:''
+                    } );
+                }
 
             } );
         }
@@ -89,9 +112,14 @@ exports.register = function( req, res ) {
                 } );
 
                 // return the information including token as JSON
-                res.render( 'transactions', {
+                res.render( 'newtransactions', {
                     token: token,
-                    title: 'Transactions Page'
+                    username: user.name,
+                    title: 'Transactions Page',                   
+                    customerProfileId: '',
+                    custcardexpirymonth : '',
+                    custcardexpiryyear: '',
+                    customerCardId:''
                 } );
             } );
         }

@@ -3,6 +3,8 @@
 var Transactions = require( '../models/transactions.model.js' );
 var config = require( '../config' );
 var Stripe = require( 'stripe' )( config.stripeApiKey );
+var User = require( '../models/user.model.js' );
+var transactionController = require( '../api/transactionsController.js' );
 
 exports.index = function( req, res, next ) {
     if ( req.body ) {
@@ -18,36 +20,123 @@ exports.index = function( req, res, next ) {
     }
 };
 
+exports.createProfileWithTransaction = function( req, res, next ) {
+
+	var cardnumber = req.body.customerid;
+	var cardexpirymonth = req.body.cardexpirymonth;
+	var cardexpiryyear = req.body.cardexpiryyear;
+	var cvc = req.body.cvc;
+	var email = req.body.username;
+	
+	Stripe.customers.create({
+		card : {
+			number : cardnumber,
+			exp_month : cardexpirymonth,
+			exp_year : cardexpiryyear,
+			cvc : cvc
+		},
+		email : email,
+		description : 'payinguser@example.com'
+	}, function(err, customer) {
+		if (err) {
+			return res.json( {
+                success: false,
+                message: err.message
+            });
+		}
+		Stripe.charges.create( {
+	        amount: req.body.amount,
+	        currency: req.body.currency,
+	        customer : customer.id
+	    }, function( err, charge ) {
+	    	if (err) {
+	    		if(err.param == 'amount' && err.message == 'Invalid integer: ') {
+	    			return res.json( {
+		                success: false,
+		                message: 'Invalid amount'
+		            });
+	    		}else {
+		    		return res.json( {
+		                success: false,
+		                message: err.message
+		            });
+	    		}
+			}
+			User.findOne({ name : email}, function (err, users){
+				users.customerId = customer.id;
+				users.save(function (err){	
+					if (err) {
+						return res.status(500);
+					}
+				});
+			});
+	        var transaction = new Transactions( {
+	            transactionId: charge.id,
+	            amount: charge.amount,
+	            created: charge.created,
+	            currency: charge.currency,
+	            description: charge.description,
+	            paid: charge.paid,
+	            sourceId: charge.source.id
+	        } );
+	        transaction.save( function( err ) {
+	                if ( err ) {
+	                    return res.status( 500 );
+	                }
+	                else {
+	                    res.status( 200 ).json( {
+	                        message: 'Payment is created.'
+	                    } );
+	                }
+	            } );
+	    } );
+	});
+};
+
 exports.createTransaction = function( req, res, next ) {
 
-    Stripe.charges.create( {
-        amount: req.body.amount,
-        currency: req.body.currency,
-        source: req.body.token,
-        description: 'Charge for test@example.com'
-    }, function( err, charge ) {
-        if ( err ) {
-            return console.log( err );
-        }
-        var transaction = new Transactions( {
-            transactionId: charge.id,
-            amount: charge.amount,
-            created: charge.created,
-            currency: charge.currency,
-            description: charge.description,
-            paid: charge.paid,
-            sourceId: charge.source.id
-        } );
-        transaction.save( function( err ) {
-                if ( err ) {
-                    return res.status( 500 );
-                }
-                else {
-                    res.status( 200 ).json( {
-                        message: 'Payment is created.'
-                    } );
-                }
-            } );
-            // asynchronously called
-    } );
+	var email = req.body.username;
+	var customerId = req.body.customerProfileId;	
+	if(!customerId) { 
+		transactionController.createProfileWithTransaction(req, res, next);
+	}else {
+		Stripe.charges.create( {
+	        amount: req.body.amount,
+	        currency: req.body.currency,
+	        customer : customerId
+	    }, function( err, charge ) {
+	    	if (err) {
+	    		if(err.param == 'amount' && err.message == 'Invalid integer: ') { 
+	    			return res.json( {
+		                success: false,
+		                message: 'Invalid amount'
+		            });
+	    		}else {
+		    		return res.json( {
+		                success: false,
+		                message: err.message
+		            });
+	    		}
+			}		
+	        var transaction = new Transactions( {
+	            transactionId: charge.id,
+	            amount: charge.amount,
+	            created: charge.created,
+	            currency: charge.currency,
+	            description: charge.description,
+	            paid: charge.paid,
+	            sourceId: charge.source.id
+	        } );
+	        transaction.save( function( err ) {
+	                if ( err ) {
+	                    return res.status( 500 );
+	                }
+	                else {
+	                    res.status( 200 ).json( {
+	                        message: 'Payment is created.'
+	                    } );
+	                }
+	            } );
+	    } );
+	}
 };
