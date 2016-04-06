@@ -1,19 +1,68 @@
-<h1>Transactions page</h1>
-<p>Your token:<span id="token"><%=token%></span></p>
+<% hasCard = user.stripe.last4 ? true : false %>
 
-<h2>Create Stripe Payments</h2>
+<h2>Transactions page</h2>
+<p style=display:none>Your token:<span id="token"><%= token %></span></p>
 
-<label for="amount">Amount:</label>
-<input type="number" name="amount" id="amount"><br>
-<label for="currency">Currency: </label>
-<input type="text" name="currency" id="currency"><br>
-<label for="cardnumber">Card number </label>
-<input type="text" name="customerid" id="cardnumber" class="card-number"><br>
-<label for="cvc">CVC: </label>
-<input type="number" name="cvc" id="cvc" class="card-cvc"><br>
-<label for="card-expiry-month">Expired Month: </label>
-<input type="number" name="card-expiry-month" id="card-expiry-month" class="card-expiry-month"><br>
-<label for="card-expiry-year">Expired Year: </label>
-<input type="number" name="card-expiry-year" id="card-expiry-year" class="card-expiry-year"><br>
-<p class="payment-errors"></p>
-<input type="button" class="submittransaction" id="submittransaction" value="Submit">
+<h3>Create Stripe Payments</h3>
+<div id="card-select">
+  <% if(hasCard) { %>
+    <div class="radio">
+      <label> 
+        <input type="radio" id="existing-card" value="existing-card" name="payment-method" checked/>
+        Use card ending with <strong><%= user.stripe.last4 %></strong>
+      </label>
+    </div>
+  <% } %>
+  <div class="radio">
+    <label> 
+      <input type="radio" id="new-card" value="new-card" name="payment-method" <% if(!hasCard) { %>checked<% } %>/>
+      Use new card
+    </label>
+  </div>
+</div>
+<div class="form-horizontal">
+  <div class="form-group">
+    <label for="amount" class="col-sm-3 control-label">Amount: </label>
+    <div class="col-sm-8">
+      <input type="number"  class="form-control" name="amount" id="amount">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="currency" class="col-sm-3 control-label">Currency: </label>
+    <div class="col-sm-8">
+      <input type="text" class="form-control" name="currency" id="currency">
+    </div>
+  </div>
+  <div id="card-detail" style="<%= hasCard ? 'display: none' : '' %>">
+    <div class="form-group">
+      <label for="cardnumber" class="col-sm-3 control-label">Card number: </label>
+      <div class="col-sm-8">
+        <input type="text" class="form-control card-number" name="cardnumber" id="cardnumber" class="">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="cvc" class="col-sm-3 control-label">CVC: </label>
+      <div class="col-sm-8">
+        <input type="number" class="form-control card-cvc" name="cvc" id="cvc">
+      </div>    
+    </div>
+    <div class="form-group">
+      <label for="card-expiry-month" class="col-sm-3 control-label">Expired Month: </label>
+      <div class="col-sm-8">
+        <input type="number" class="form-control card-expiry-month" name="card-expiry-month" id="card-expiry-month">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="card-expiry-year" class="col-sm-3 control-label">Expired Year: </label>
+      <div class="col-sm-8">
+        <input type="number" class="form-control card-expiry-year" name="card-expiry-year" id="card-expiry-year">
+      </div>
+    </div>
+  </div>
+  <p class="payment-errors"></p>
+  <div class="form-group">
+    <div class="col-sm-8 col-sm-offset-3">
+      <input type="button" class="btn btn-primary btn-lg submittransaction" id="submittransaction" value="Submit">
+    </div>
+  </div>
+</div>

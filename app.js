@@ -37,7 +37,11 @@ app.use( expressLayouts );
 
 var mongoDB = require( './config/mongoDB.js' );
 
-
+app.use(function(req, res, next){
+  // Make environment variables available in the view
+  res.locals.publishableKey = config.stripe.publishableKey;
+  next();
+});
 
 app.use( '/', routes );
 app.use( '/users', users );

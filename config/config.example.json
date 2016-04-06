@@ -1,5 +1,8 @@
 {
     "mongoURI": "mongodb://username:password@server/database",
     "secret": "thisisasecret",
-    "stripeApiKey": "apikey"
+    "stripe": {
+      "secretKey": "sk_test_secretKey",
+      "publishableKey": "pk_test_publishableKey"
+    }
 }

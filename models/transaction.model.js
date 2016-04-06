@@ -1,10 +1,10 @@
 'use strict';
 
 var mongoose = require( 'mongoose' );
-var config = require( '../config' );
+var Schema = mongoose.Schema,
+    ObjectId = Schema.ObjectId;
 
-
-var transactionsSchema = mongoose.Schema( {
+var transactionSchema = new Schema( {
     transactionId: String,
     amount: Number,
     created: Number,
@@ -14,6 +14,6 @@ var transactionsSchema = mongoose.Schema( {
     sourceId: String
 } );
 
-var Transactions = mongoose.model( 'Transactions', transactionsSchema );
+var Transaction = mongoose.model( 'Transaction', transactionSchema );
 
-module.exports = Transactions;
+module.exports = Transaction;
