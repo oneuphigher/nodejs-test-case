@@ -3,14 +3,15 @@
 var mongoose = require( 'mongoose' );
 var bcrypt = require('bcrypt');
 var config = require( '../config' );
+var stripeCustomer = require('./plugins/stripe-customer');
 var apiError = require('../api/api-error');
 
-
 var userSchema = mongoose.Schema( {
-    name: String,
+    email: String,
     password: String
 } );
 
+userSchema.plugin(stripeCustomer, config.stripe);
 
 userSchema.pre('save', function(next) {
     var user = this;

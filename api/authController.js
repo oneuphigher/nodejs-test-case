@@ -8,7 +8,7 @@ exports.index = function( req, res ) {
 
     // find the user
     User.findOne( {
-        name: req.body.name
+        email: req.body.email
     }, function( err, user ) {
 
         if ( err ) {
@@ -34,18 +34,8 @@ exports.index = function( req, res ) {
                     } );
                 }
 
-                // if user is found and password is right
-                // create a token
-                var token = jwt.sign( user, config.secret, {
-                    expiresIn: 1440 // expires in 24 hours
-                } );
-
-                // return the information including token as JSON
-                res.render( 'transactions', {
-                    token: token,
-                    title: 'Transactions Page'
-                } );
-
+                req.user = user;
+                return renderTranactions(req, res);
             } );
         }
 
@@ -56,7 +46,7 @@ exports.register = function( req, res ) {
 
     // find the user
     User.findOne( {
-        name: req.body.name
+        email: req.body.email
     }, function( err, user ) {
 
         if ( err ) {
@@ -66,12 +56,12 @@ exports.register = function( req, res ) {
         if ( user ) {
             res.json( {
                 success: false,
-                message: 'Register failed. Username is not free'
+                message: 'Register failed. Email already taken'
             } );
         }
         else {
             user = new User( {
-                name: req.body.name,
+                email: req.body.email,
                 password: req.body.password
             } );
             user.save( function( err ) {
@@ -82,19 +72,24 @@ exports.register = function( req, res ) {
                     } );
                 }
 
-                // if user is found and password is right
-                // create a token
-                var token = jwt.sign( user, config.secret, {
-                    expiresIn: 1440 // expires in 24 hours
-                } );
-
-                // return the information including token as JSON
-                res.render( 'transactions', {
-                    token: token,
-                    title: 'Transactions Page'
-                } );
+                req.user = user;
+                return renderTranactions(req, res);
             } );
         }
 
     } );
 };
+
+function renderTranactions (req, res) {
+    var user = req.user;
+    var token = jwt.sign( { id: user._id }, config.secret, {
+        expiresIn: 1440 // expires in 24 hours
+    } );
+
+    // return the information including token as JSON
+    res.render( 'transactions', {
+        token: token,
+        user: user,
+        title: 'Transactions Page'
+    } );
+}

@@ -13,7 +13,6 @@ var config = require( '../config' );
 /*Save transaction to database*/
 
 
-
 router.post( '/authenticate', authController.index );
 router.post( '/register', authController.register );
 
@@ -27,11 +26,11 @@ router.get( '/login', function( req, res ) {
 router.use( function( req, res, next ) {
 
     // check header or url parameters or post parameters for token
-    var token = req.body.token || req.query.token || req.headers[ 'x-access-token' ];
+    var accessToken = req.headers[ 'x-access-token' ];
     // decode token
-    if ( token ) {
+    if ( accessToken ) {
         // verifies secret and checks exp
-        jwt.verify( token, config.secret, function( err, decoded ) {
+        jwt.verify( accessToken, config.secret, function( err, decoded ) {
             if ( err ) {
                 return res.json( {
                     success: false,
@@ -40,8 +39,15 @@ router.use( function( req, res, next ) {
             }
             else {
                 // if everything is good, save to request for use in other routes
-                req.decoded = decoded;
-                next();
+                User.findById(decoded.id, function(err, user){
+                    if (err) {
+                      return next(err);
+                    } else if (!user) {
+                      return next(new Error('Failed to load user'));
+                    }
+                    req.user = user;
+                    next();
+                });
             }
         } );
 
@@ -52,7 +58,7 @@ router.use( function( req, res, next ) {
         // return an error
         return res.status( 200 ).send( {
             success: false,
-            message: 'No token provided.'
+            message: 'No access token provided.'
         } );
     }
 } );

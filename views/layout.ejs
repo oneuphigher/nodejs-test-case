@@ -13,10 +13,15 @@
     <!-- Style CSS -->
     <!--<link href="/stylessheets/style.css" media="screen" rel="stylesheet">-->
     <!--<link href="/stylessheets/main.css" media="screen" rel="stylesheet" type="text/css">-->
+    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
 
     <!-- General Scripts -->
     <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-    <script src="/javascripts/jlib/query.js"></script>
+    <script src="/javascripts/lib/jquery.js"></script>
+    <script src="/javascripts/lib/bootstrap.min.js"></script>
+    <script type="text/javascript">
+      window.publishableKey = "<%= locals.publishableKey %>";
+    </script>
     <script src="/javascripts/main.js"></script>
 </head>
 
