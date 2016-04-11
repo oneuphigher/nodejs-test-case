@@ -13,6 +13,9 @@ var config = require( './config' );
 var routes = require( './routes/index' );
 var users = require( './routes/users' );
 
+var pg = require('pg');
+
+
 var app = express();
 
 // view engine setup
@@ -35,8 +38,7 @@ app.use( cookieParser() );
 app.use( express.static( path.join( __dirname, 'public' ) ) );
 app.use( expressLayouts );
 
-var mongoDB = require( './config/mongoDB.js' );
-
+// var mongoDB = require( './config/mongoDB.js' );
 
 
 app.use( '/', routes );

@@ -1,59 +1,96 @@
 'use strict';
 
-var mongoose = require( 'mongoose' );
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcrypt-nodejs');
 var config = require( '../config' );
 var apiError = require('../api/api-error');
+var db = require('../models/db.js');
 
 
-var userSchema = mongoose.Schema( {
-    name: String,
-    password: String
-} );
+// returns user object if found, else returns undefined
+exports.findUserByUsername = function(username, cb) {
 
+  var sql = `
+    SELECT *
+    FROM users
+    WHERE username = $1
+  `;
 
-userSchema.pre('save', function(next) {
-    var user = this;
-
-    // only hash the password if it has been modified (or is new)
-    if(!this.isModified('password')) {
-        return next();
+  db.query(sql, [username], function(err, result) {
+    if (err){
+     return cb(err);
     }
+    cb(null, result.rows[0]);
+  });
+};
 
-    // generate a salt
+// returns user object if found, else returns undefined
+exports.findUserById = function(id, cb) {
+  var sql = `
+    SELECT *
+    FROM users
+    WHERE id = $1
+  `;
+
+  db.query(sql, [id], function(err, result) {
+    if (err) return cb(err);
+    cb(null, result.rows[0]);
+  });
+};
+
+
+// update customer id in users
+exports.updateUsersCustomerId = function(data, cb) {
+  var sql = `
+    UPDATE users SET customer_id = $2 WHERE id = $1;
+  `;
+
+  db.query(sql, [data.id,data.customer_id], function(err, result) {
+    if (err) return cb(err);
+    cb(null, result.rows[0]);
+  });
+};
+
+// returns created user object
+exports.insertUser = function(data, cb) {
+  var sql = `
+    INSERT INTO users(username, password)
+    VALUES ($1, $2)
+    RETURNING *  -- tells postgres to return the created user record to us
+  `;
+
+  // generate a salt
     bcrypt.genSalt(10, function(err, salt) {
         if (err) {
             return next(new apiError.Misconfigured('Failed to generate salt','salt_generation_error',err));
         }
 
         // hash the password using our new salt
-        bcrypt.hash(user.password, salt, function(err, hash) {
+        bcrypt.hash(data.password, salt, null,function(err, hash) {
             if (err) {
                 return next(new apiError.Misconfigured('Failed to hash password salt','password_hashing_error',err));
             }
 
             // override the cleartext password with the hashed one
-            user.password = hash;
-            next();
+            
+            db.query(sql, [data.username, hash], function(err, result) {
+              if (err) return cb(err);
+              cb(null, result.rows[0]);
+            });
         });
     });
-});
 
-userSchema.methods.comparePassword = function(candidatePassword, cb) {
-    var self = this;
 
-    if(!this.password) {
-        return cb(null,false);
-    }
+};
 
-    bcrypt.compare(candidatePassword, self.password, function(err, isMatch) {
+// returns compare passoword with hash
+exports.compareUserPassword = function(data, cb) {
+   
+
+    bcrypt.compare(data.comparePassword, data.password, function(err, isMatch) {
         if (err) {
             return cb(new apiError.Misconfigured('Failed to check password hash','password_hash_check_error',err));
         }
         cb(null, isMatch);
     });
+
 };
-
-var User = mongoose.model( 'User', userSchema );
-
-module.exports = User;
