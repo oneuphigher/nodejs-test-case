@@ -1,0 +1,5 @@
+{
+    "mongoURI": "mongodb://oneup:oneuppassword@127.0.0.1/oneup",
+    "secret": "thisisasecret",
+    "stripeApiKey": "sk_test_ZGEfvQitsWzVCWFSs5oQa0PH"
+}

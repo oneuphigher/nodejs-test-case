@@ -10,4 +10,5 @@
 Thumbs.db
 /nbproject
 node_modules
+config/conf.d/**/*.json
 dev/
