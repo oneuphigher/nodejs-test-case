@@ -1,5 +1,5 @@
 {
-    "mongoURI": "mongodb://oneup:oneuppassword@127.0.0.1/oneup",
+    "mongoURI": "mongodb://oneup:oneuppassword@voyage-gerard-39018.herokuapp.com/oneup",
     "secret": "thisisasecret",
     "stripeApiKey": "sk_test_ZGEfvQitsWzVCWFSs5oQa0PH"
 }
