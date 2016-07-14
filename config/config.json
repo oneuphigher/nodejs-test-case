@@ -1,0 +1,5 @@
+{
+    "mongoURI": "mongodb://oneup:oneup@ds023560.mlab.com:23560/heroku_qjmhzrr5",
+    "secret": "thisisasecret",
+    "stripeApiKey": "sk_test_ZGEfvQitsWzVCWFSs5oQa0PH"
+}

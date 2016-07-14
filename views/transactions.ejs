@@ -1,19 +1,129 @@
-<h1>Transactions page</h1>
-<p>Your token:<span id="token"><%=token%></span></p>
 
-<h2>Create Stripe Payments</h2>
+<div class="row">
 
-<label for="amount">Amount:</label>
-<input type="number" name="amount" id="amount"><br>
-<label for="currency">Currency: </label>
-<input type="text" name="currency" id="currency"><br>
-<label for="cardnumber">Card number </label>
-<input type="text" name="customerid" id="cardnumber" class="card-number"><br>
-<label for="cvc">CVC: </label>
-<input type="number" name="cvc" id="cvc" class="card-cvc"><br>
-<label for="card-expiry-month">Expired Month: </label>
-<input type="number" name="card-expiry-month" id="card-expiry-month" class="card-expiry-month"><br>
-<label for="card-expiry-year">Expired Year: </label>
-<input type="number" name="card-expiry-year" id="card-expiry-year" class="card-expiry-year"><br>
-<p class="payment-errors"></p>
-<input type="button" class="submittransaction" id="submittransaction" value="Submit">
+	<h1>Transactions page</h1>
+	<!--<p>Your token:<span id="token"><%=token%></span></p>-->
+	<input type="hidden" value="<%=token%>" id="token" />
+
+	<div class="col-md-12 ">
+
+		<div class="alert alert-danger payment-errors" role="alert">
+			
+		</div>
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h1 class="panel-title">Create Stripe Payments</h1>
+            </div>
+            <div class="panel-body">
+            	<form id="transactionform">
+                    <div class="form-group">
+                        <label for="amount">Amount: </label>
+                        <input type="number" class="form-control" name="amount" id="amount">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="currency">Currency: </label>
+                        <input type="text" class="form-control" name="currency" id="currency">
+                    </div>
+
+                    
+
+                    <% if(locals.cards){ %>
+
+                    	<hr/>
+                    	<h4>Pay using previously stored Card</h4>
+
+						<div class="form-group">
+							<label for="card-select">Select Card: </label>
+							<select class="form-control" name="card-select" id="card-select">
+								<option value="">Select Card</option>
+
+								<% cards.data.forEach(function(card){ %>
+									
+									<option value="<%=card.id%>">
+										XXXX-XXXX-XXXX-<%= card.last4 %> ----
+										<%= card.exp_month %>/
+										<%= card.exp_year %>
+									</option>
+								<% });%>
+							</select>
+						</div>
+
+						
+					<% } %>
+
+					<div> 
+						<hr/>
+						<h4>Pay using New card</h4>
+					</div>
+
+					<div class="form-group">
+                        <label for="currency">Card number: </label>
+                        <input type="text" class="form-control card-number" name="customerid" id="cardnumber">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cvc">CVC: </label>
+                        <input type="number" class="form-control card-cvc" name="cvc" id="cvc">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="card-expiry-month">Expired Month: </label>
+                        <input type="number" class="form-control card-expiry-month" name="card-expiry-month" id="card-expiry-month">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="card-expiry-year">Expired Year: </label>
+                        <input type="number" class="form-control card-expiry-year" name="card-expiry-year" id="card-expiry-year">
+                    </div>
+
+					<div class="form-group">
+                        <input type="button" class="submittransaction btn btn-primary" id="submittransaction" value="Submit">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+	<!--<h2>Create Stripe Payments</h2>
+
+	<form id="transactionform">
+	<label for="amount">Amount:</label>
+	<input type="number" name="amount" id="amount"><br>
+	<label for="currency">Currency: </label>
+	<input type="text" name="currency" id="currency"><br>
+
+	<% if(locals.cards){ %>
+	<div>
+	<label for="cardnumber">Select stored Card: </label>
+	<select name="card-select" id="card-select">
+	<option value="">Select Card</option>
+
+	<% cards.data.forEach(function(card){ %>
+		
+		<option value="<%=card.id%>">
+			XXXX-XXXX-XXXX-<%= card.last4 %> ----
+			<%= card.exp_month %>/
+			<%= card.exp_year %>
+		</option>
+	<% });%>
+	</select>
+	</div>
+	<% } %>
+
+	<h3>OR</h3>
+
+	<label for="cardnumber">Card number </label>
+	<input type="text" name="customerid" id="cardnumber" class="card-number"><br>
+	<label for="cvc">CVC: </label>
+	<input type="number" name="cvc" id="cvc" class="card-cvc"><br>
+	<label for="card-expiry-month">Expired Month: </label>
+	<input type="number" name="card-expiry-month" id="card-expiry-month" class="card-expiry-month"><br>
+	<label for="card-expiry-year">Expired Year: </label>
+	<input type="number" name="card-expiry-year" id="card-expiry-year" class="card-expiry-year"><br>
+	<p class="payment-errors"></p>
+	<input type="button" class="submittransaction" id="submittransaction" value="Submit">
+	</form>-->
+
+</div>
