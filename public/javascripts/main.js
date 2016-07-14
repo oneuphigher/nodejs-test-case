@@ -12,6 +12,7 @@ $( document ).ready( function() {
 
     $( '#submittransaction' ).click( function() {
         console.log( 'ok' );
+        $(".payment-errors").hide();
         if ( !isSubmit ) {     
 
             if($("#card-select").val() == '' || $("#card-select").val() == undefined){

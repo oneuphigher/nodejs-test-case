@@ -29,7 +29,7 @@ exports.createTransaction = function( req, res, next ) {
             currency: req.body.currency,
             card: req.body.storedCardId,
             customer: req.decoded._doc.customerId,
-            description: 'Charge for existingcard@example.com'
+            description: req.decoded._doc.name+'- Charge From existingcard'
         }, function(err, charge){
             if ( err ) {
                 return console.log( err );
@@ -79,7 +79,7 @@ exports.createTransaction = function( req, res, next ) {
                             currency: req.body.currency,
                             card: cardDetails.cardId,
                             customer: req.decoded._doc.customerId,
-                            description: 'Charge for existingcard@example.com'
+                            description: req.decoded._doc.name+'- Charge From existingcard'
                         }, function(err, charge){
                             if ( err ) {
                                 return console.log( err );
@@ -127,7 +127,8 @@ exports.createTransaction = function( req, res, next ) {
                                 amount: req.body.amount, // amount in cents, again
                                 currency: req.body.currency,
                                 card: card.id,
-                                customer: req.decoded._doc.customerId
+                                customer: req.decoded._doc.customerId,
+                                description: req.decoded._doc.name+'- Charge From newcard'
                             }, function(err, charge){
                                 if ( err ) {
                                     return console.log( err );
@@ -164,7 +165,7 @@ exports.createTransaction = function( req, res, next ) {
 
             Stripe.customers.create({
                 source: req.body.token,
-                description: 'payinguser@example.com'
+                description: req.decoded._doc.name+'- Charge From newcard and customer'
             }, function(err, customer) {
                 if ( err ) {
                     return console.log( err );
